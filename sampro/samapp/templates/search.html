@@ -1,11 +1,15 @@
 <!DOCTYPE html> 
 <html lang="ja"> 
 <head> 
+
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>検索</title> 
 </head> 
+
 <body> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% load static %}
 <style>
 * {
 margin: 0;
@@ -16,21 +20,48 @@ box-sizing: border-box;
 .search{
     
     background-color: black;
-    padding:20px 0;
+    height:60px;
     margin:0;
     width: 100vw;
+    transition: 1s;
     position: fixed;
 }
+.search.hide {
+    transform:translateY(-60px);
+}
+.mainimg{
+    width:100%;
+    padding:1000px;
+}
+
 
 </style>
+<script>
+    $(function(){
+        var pos = 0;
+        var header = $('.search');
 
+        $(window).on('scroll', function(){
+            if($(this).scrollTop() < pos ){
+                // 上にスクロールしたとき
+                header.removeClass('hide');
+            } else {
+                // 下にスクロールしたとき
+                header.addClass('hide');
+            }
+            pos = $(this).scrollTop();
+        });
+    });
+</script>
 
 
 <form method="get">
     <div class="search">
     {{ form.as_p }}
     </div>
-<label for="category">カテゴリ:</label> 
+<img src="{% static 'myapp/4877368.jpg' %}" class="mainimg">
+
+<label for="category" class="labels">カテゴリ:</label> 
 <select name="category"> 
 <option value="">すべて</option> 
 <option value="books">プログラミング</option> 
