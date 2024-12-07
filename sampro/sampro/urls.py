@@ -15,8 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.http import HttpResponse
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    path('accounts/profile/', lambda request: HttpResponse('Profile page')),
     path('', include('samapp.urls')),
 ]
+
+# path('', include('accounts.urls')),
+    # path('accounts/', include('allauth.urls')),
+    # path('login/', include('accounts.urls')),

@@ -1,9 +1,9 @@
-from django.urls import path
+from django.urls import path,include
 from . import views
+app_name = 'samapp'
 
 urlpatterns = [
-    path('', views.search_view, name='search'),
-    path('search/', views.search_view, name='search_view'), 
+    path('',views.search_view, name='search'), 
     path('product/new/', views.product_create, name='product_create'), 
     path('product/<int:pk>/', views.product_detail, name='product_detail'), 
     path('product/<int:pk>/edit/',  views.product_update, name='product_update'), 

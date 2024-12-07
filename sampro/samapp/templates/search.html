@@ -10,6 +10,7 @@
 <body> 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 {% load static %}
+
 <style>
 * {
 margin: 0;
@@ -17,7 +18,7 @@ padding: 0;
 box-sizing: border-box;
 }
 
-.search{
+/* .search{
     
     background-color: black;
     height:60px;
@@ -25,17 +26,65 @@ box-sizing: border-box;
     width: 100vw;
     transition: 1s;
     position: fixed;
-}
+} */
 .search.hide {
     transform:translateY(-60px);
 }
 .mainimg{
     width:100%;
-    padding:1000px;
 }
-
-
+.flexs{
+    display: flex;
+    text-align: center;
+    width: 100%;
+    
+    margin: auto;
+}
+.header{
+    display: flex;
+    background-color: rgb(33, 33, 33);
+    height:80px;
+    margin:0;
+    width: 100vw;
+    transition: 1s;
+    position: fixed;
+    color:rgb(227, 227, 227);
+}
+.sort{
+    display: flex;
+    flex-direction: column;
+}
+.search-result{
+    display: flex;
+    flex-wrap: wrap; /* 横に並べ、余白があれば次の行に折り返し */
+    gap: 20px; /* 各商品間の間隔 */
+    justify-content: space-between; /* 水平方向に均等配置 */
+    width: 70vw;
+}
+.product-item{
+flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
+        box-sizing: border-box; /* パディングやボーダーを幅に含める */
+        text-align: center; /* 中央揃え */
+        border: 1px solid #ddd; /* 枠線を追加 */
+        border-radius: 5px; /* 角を丸くする */
+        padding: 10px; /* 内側の余白 */
+}
+.search-item{
+    width: 25vw;
+    padding: 0vw 2vw;
+}
+.login{
+    color:rgb(255, 255, 255);
+    text-decoration: none;
+    padding: 0 20px;
+}
+.logout{
+    color:rgb(255, 255, 255);
+    text-decoration: none;
+}
 </style>
+
+
 <script>
     $(function(){
         var pos = 0;
@@ -54,56 +103,87 @@ box-sizing: border-box;
     });
 </script>
 
+<div class="header"> <!--ヘッダー要素-->
+    <p class="title">hello</p>
+    <a href="{% url 'account_login' %}" class="login">Login</a>
+    <a href="{% url 'account_logout' %} " class="logout">Logout</a>
 
-<form method="get">
-    <div class="search">
-    {{ form.as_p }}
-    </div>
+</div><!--ヘッダー要素-->
+
 <img src="{% static 'myapp/4877368.jpg' %}" class="mainimg">
 
-<label for="category" class="labels">カテゴリ:</label> 
-<select name="category"> 
-<option value="">すべて</option> 
-<option value="books">プログラミング</option> 
-<option value="electronics">電子機器</option> 
-</select>
-<label for="min_price">最低価格:</label> 
-<input type="number" name="min_price" min="0"> 
-<label for="max_price">最高価格:</label> 
-<input type="number" name="max_price" min="0"> 
-<!-- 並び替えの選択 --> 
-<label for="sort">並び替え:</label> 
-<select name="sort"> 
-<option value="name">名前順</option> 
-<option value="price_asc">価格が安い順</option> 
-<option value="price_desc">価格が高い順</option> 
-</select> 
-<button type="submit">検索</button> 
-</for>
-
-
-<ul> 
-    {% for product in page_obj %} 
-        <li>{{ product.name }} - {{ product.price }}</li> 
-    {% empty %} 
-        <li>No results found</li> 
-    {% endfor %} 
-    </ul> 
-
-    <div class="pagination"> 
-        <span class="step-links"> 
-            {% if page_obj.has_previous %} 
-                <a href="?page=1">最初</a> 
-                <a href="?page={{ page_obj.previous_page_number }}">前へ</a> 
-            {% endif %} 
-
-            <span>ページ {{ page_obj.number }} /  
-    {{ page_obj.paginator.num_pages }}</span> 
-
-            {% if page_obj.has_next %} 
-                <a href="?page={{ page_obj.next_page_number }}">次へ</a> 
-                <a href="?page={{ page_obj.paginator.num_pages }}">最後</a> 
-            {% endif %} 
-        </span> 
+<div class="flexs">
+<div class="flex-child">
+    <div class="search-item">
+    <form method="get">
+        <div class="search">
+        {{ form.as_p }}
+        </div>
+        <div class="sort">
+        <label for="category" class="labels">カテゴリ:</label> 
+        <select name="category"> 
+            <option value="">すべて</option> 
+            <option value="books">プログラミング</option> 
+            <option value="electronics">電子機器</option> 
+        </select>
+        <label for="min_price">最低価格:</label> 
+        <input type="number" name="min_price" min="0"> 
+        <label for="max_price">最高価格:</label> 
+        <input type="number" name="max_price" min="0"> 
+        <!-- 並び替えの選択  -->
+        <label for="sort">並び替え:</label> 
+        <select name="sort"> 
+        <option value="name">名前順</option> 
+        <option value="price_asc">価格が安い順</option> 
+        <option value="price_desc">価格が高い順</option> 
+        </select> 
+        <fieldset>
+            <legend>価格帯</legend>
+            <label><input type="checkbox" name="price_range" value="0-1000"> 0円〜1000円</label><br>
+            <label><input type="checkbox" name="price_range" value="1000-5000"> 1000円〜5000円</label><br>
+            <label><input type="checkbox" name="price_range" value="5000-10000"> 5000円〜10000円</label><br>
+            <label><input type="checkbox" name="price_range" value="10000-30000"> 10000円〜30000円</label><br>
+            <label><input type="checkbox" name="price_range" value="30000-"> 30000円以上</label><br>
+        </fieldset>
+        <button type="submit">検索</button> 
+        </div>
+    </form>
     </div>
+</div>
 
+<div class="flex-child">
+    <div class="search-result">
+        {% for product in page_obj %} 
+        <div class="product-item">
+        <a href="{% url 'samapp:product_detail' pk=product.id %}">
+            <!-- 商品画像 -->
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            <!-- 商品名 -->
+            <p>{{ product.name }}</p>
+            <!-- 商品価格 -->
+            <p>{{ product.price }}円</p>
+        </a>
+        </div>
+        {% empty %} 
+            <p>No results found</p>
+        {% endfor %} 
+
+        <div class="pagination"> 
+            <span class="step-links"> 
+                {% if page_obj.has_previous %} 
+                    <a href="?page=1">最初</a> 
+                    <a href="?page={{ page_obj.previous_page_number }}">前へ</a> 
+                {% endif %} 
+
+                <span>ページ {{ page_obj.number }} /  
+        {{ page_obj.paginator.num_pages }}</span> 
+
+                {% if page_obj.has_next %} 
+                    <a href="?page={{ page_obj.next_page_number }}">次へ</a> 
+                    <a href="?page={{ page_obj.paginator.num_pages }}">最後</a> 
+                {% endif %} 
+            </span> 
+        </div>
+    </div>
+</div>
+</div>

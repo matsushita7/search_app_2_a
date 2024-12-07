@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Product, Category 
 from .forms import ProductForm, SearchForm 
 from django.core.paginator import Paginator 
+from django.db.models import Q
 
 def product_create(request): 
     if request.method == 'POST': 
@@ -52,20 +53,34 @@ def search_view(request):
     category_name = request.GET.get('category') 
     if category_name: 
         try: 
-            # カテゴリ名に基づいてカテゴリIDを取得 
             category = Category.objects.get(name=category_name) 
             results = results.filter(category_id=category.id) 
         except Category.DoesNotExist: 
-            results = results.none() # 存在しないカテゴリの場合、結果を空にする 
-            category = None 
-    # 価格のフィルタリング（最低価格・最高価格） 
+            results = results.none() 
+
+    # 最低価格・最高価格のフィルタリング
     min_price = request.GET.get('min_price') 
     max_price = request.GET.get('max_price')
-    
     if min_price: 
         results = results.filter(price__gte=min_price) 
     if max_price: 
         results = results.filter(price__lte=max_price) 
+
+    # チェックボックスで指定された価格帯フィルタリング
+    price_ranges = request.GET.getlist('price_range') 
+    if price_ranges: 
+        price_query = Q()  # 初期化
+        for price_range in price_ranges: 
+            if '-' in price_range: 
+                min_price, max_price = price_range.split('-') 
+                if min_price: 
+                    price_query |= Q(price__gte=int(min_price)) 
+                if max_price: 
+                    price_query &= Q(price__lte=int(max_price)) 
+            elif price_range.endswith('-'):  # 30000- の場合
+                min_price = price_range.split('-')[0] 
+                price_query |= Q(price__gte=int(min_price)) 
+        results = results.filter(price_query) 
 
     # 並び替え処理 
     sort_by = request.GET.get('sort', 'name') 
@@ -79,4 +94,9 @@ def search_view(request):
     page_number = request.GET.get('page') 
     page_obj = paginator.get_page(page_number) 
 
-    return render(request, 'search.html', {'form': form, 'page_obj': page_obj, 'results': results}) 
+    return render(request, 'search.html', {'form': form, 'page_obj': page_obj, 'results': results})
+
+#　カートに保存する機能
+#　購入が押された商品のデータを入手し、売れ筋ランキングや、管理者画面から在庫追加した方がいいものを見れるようにする。
+# 検索数トップも作る
+#　在庫がない場合、「発送が遅れる場合があります」という表記が出る。
