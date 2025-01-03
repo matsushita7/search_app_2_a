@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カートに追加しました</title>
+</head>
+<body>
+    <h1>カートに追加しました</h1>
+    <p>{{ product.name }}がカートに追加されました。</p>
+    <p>現在のカートの合計個数: 
+        {{ request.session.cart|length }}
+    </p>
+    <!-- ボタン -->
+    <div>
+        <form action="{% url 'samapp:product_detail' pk=product.id %}">
+            <button type="submit">ショッピングを続ける</button>
+        </form>
+        <form action="{% url 'samapp:cart_detail' %}">
+            <button type="submit">購入へ進む</button>
+        </form>
+    </div>
+</body>
+</html>

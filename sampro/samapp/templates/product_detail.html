@@ -20,13 +20,65 @@
     <h2 class="card-title">{{ product.name }}</h2> 
         <p class="card-text">{{ product.description }}</p> 
         <p class="card-text"><strong>{{ product.price|floatformat:0|intcomma }}円</strong></p>
-
+    <form action="{% url 'samapp:add_to_cart' product.id %}" method="post">
+        {% csrf_token %}
+        <div class="quantity-selector">
+            <button type="button" class="decrement">−</button>
+            <input type="number" name="quantity" value="1" min="1" class="quantity-input">
+            <button type="button" class="increment">＋</button>
+        </div>
+        <button type="submit">カートに入れる</button>
+    </form>
     </form> 
+
     <a href="{% url 'samapp:search' %}" class="btn btn-primary">商品一覧に戻る</a> 
     </div> 
 </div> 
 </div> 
 </div> 
 </div> 
+
+<h2>レビュー</h2>
+<ul>
+    {% for review in product.reviews.all %}
+    <li>
+        <strong>{{ review.title }}</strong> ({{ review.rating }}/10) - {{ review.reviewer.username }}
+        <p>{{ review.content }}</p>
+        {% if review.image %}
+        <img src="{{ review.image.url }}" alt="レビュー画像">
+        {% endif %}
+        <p>購入日: {{ review.purchase_date }}</p>
+        <p>投稿日時: {{ review.created_at }}</p>
+    </li>
+    {% empty %}
+    <p>まだレビューはありません。</p>
+    {% endfor %}
+</ul>
+<a href="{% url 'samapp:product_review' product.id %}">レビューを書く</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 数量ボタンのイベントリスナー
+        document.querySelectorAll('.quantity-selector').forEach(selector => {
+            const decrementButton = selector.querySelector('.decrement');
+            const incrementButton = selector.querySelector('.increment');
+            const inputField = selector.querySelector('.quantity-input');
+
+            // マイナスボタン
+            decrementButton.addEventListener('click', () => {
+                const currentValue = parseInt(inputField.value, 10);
+                if (currentValue > 1) {
+                    inputField.value = currentValue - 1;
+                }
+            });
+
+            // プラスボタン
+            incrementButton.addEventListener('click', () => {
+                const currentValue = parseInt(inputField.value, 10);
+                inputField.value = currentValue + 1;
+            });
+        });
+    });
+</script>
 </body> 
 </html>

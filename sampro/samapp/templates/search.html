@@ -101,13 +101,38 @@ flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
             pos = $(this).scrollTop();
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('.price-checkbox'); // チェックボックスの選択
+        const minPriceInput = document.getElementById('min_price'); // 最低価格入力
+        const maxPriceInput = document.getElementById('max_price'); // 最高価格入力
+
+        // チェックボックスが選択されたときに入力フィールドをクリア
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    minPriceInput.value = ''; // 最低価格をクリア
+                    maxPriceInput.value = ''; // 最高価格をクリア
+                }
+            });
+        });
+
+        // 入力フィールドに値が入力されたときにチェックボックスをすべて外す
+        [minPriceInput, maxPriceInput].forEach(input => {
+            input.addEventListener('input', function () {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false; // チェックを外す
+                });
+            });
+        });
+    });
 </script>
 
 <div class="header"> <!--ヘッダー要素-->
     <p class="title">hello</p>
     <a href="{% url 'account_login' %}" class="login">Login</a>
     <a href="{% url 'account_logout' %} " class="logout">Logout</a>
-
+    <a href="{% url 'samapp:view_cart' %}">カート</a>
 </div><!--ヘッダー要素-->
 
 <img src="{% static 'myapp/4877368.jpg' %}" class="mainimg">
@@ -120,38 +145,70 @@ flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
         {{ form.as_p }}
         </div>
         <div class="sort">
-        <label for="category" class="labels">カテゴリ:</label> 
-        <select name="category"> 
-            <option value="">すべて</option> 
-            <option value="books">プログラミング</option> 
-            <option value="electronics">電子機器</option> 
+
+            
+        <label for="category">カテゴリを選択:</label>
+        <select name="category" id="category">
+            <option value="">すべて</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% for subcategory in category.children.all %}
+                    <option value="{{ subcategory.id }}" {% if subcategory.id|stringformat:"s" == category_id %}selected{% endif %}>
+                        -- {{ subcategory.name }}
+                    </option>
+                {% endfor %}
+            {% endfor %}
         </select>
-        <label for="min_price">最低価格:</label> 
-        <input type="number" name="min_price" min="0"> 
-        <label for="max_price">最高価格:</label> 
-        <input type="number" name="max_price" min="0"> 
-        <!-- 並び替えの選択  -->
+
         <label for="sort">並び替え:</label> 
         <select name="sort"> 
-        <option value="name">名前順</option> 
-        <option value="price_asc">価格が安い順</option> 
-        <option value="price_desc">価格が高い順</option> 
+            <option value="name" {% if sort_by == "name" %}selected{% endif %}>名前順</option> 
+            <option value="price_asc" {% if sort_by == "price_asc" %}selected{% endif %}>価格が安い順</option> 
+            <option value="price_desc" {% if sort_by == "price_desc" %}selected{% endif %}>価格が高い順</option> 
         </select> 
+
         <fieldset>
             <legend>価格帯</legend>
-            <label><input type="checkbox" name="price_range" value="0-1000"> 0円〜1000円</label><br>
-            <label><input type="checkbox" name="price_range" value="1000-5000"> 1000円〜5000円</label><br>
-            <label><input type="checkbox" name="price_range" value="5000-10000"> 5000円〜10000円</label><br>
-            <label><input type="checkbox" name="price_range" value="10000-30000"> 10000円〜30000円</label><br>
-            <label><input type="checkbox" name="price_range" value="30000-"> 30000円以上</label><br>
+            <label>
+                <input type="checkbox" name="price_range" value="0-1000" class="price-checkbox" 
+                    {% if "0-1000" in price_ranges %}checked{% endif %}> 0円〜1000円
+            </label><br>
+            <label>
+                <input type="checkbox" name="price_range" value="1000-5000" class="price-checkbox" 
+                    {% if "1000-5000" in price_ranges %}checked{% endif %}> 1000円〜5000円
+            </label><br>
+            <label>
+                <input type="checkbox" name="price_range" value="5000-10000" class="price-checkbox" 
+                    {% if "5000-10000" in price_ranges %}checked{% endif %}> 5000円〜10000円
+            </label><br>
+            <label>
+                <input type="checkbox" name="price_range" value="10000-30000" class="price-checkbox" 
+                    {% if "10000-30000" in price_ranges %}checked{% endif %}> 10000円〜30000円
+            </label><br>
+            <label>
+                <input type="checkbox" name="price_range" value="30000-" class="price-checkbox" 
+                    {% if "30000-" in price_ranges %}checked{% endif %}> 30000円以上
+            </label><br>
         </fieldset>
+        
+        <label for="min_price">最低価格:</label>
+        <input type="number" id="min_price" name="min_price" min="0" value="{{ min_price }}">
+        
+        <label for="max_price">最高価格:</label>
+        <input type="number" id="max_price" name="max_price" min="0" value="{{ max_price }}">
         <button type="submit">検索</button> 
         </div>
+    </form>
+    <form method="get" action="{% url 'samapp:search' %}">
+        <button type="submit">クリア</button>
     </form>
     </div>
 </div>
 
 <div class="flex-child">
+    <P>{{ results_count }}件</P>
     <div class="search-result">
         {% for product in page_obj %} 
         <div class="product-item">
@@ -162,10 +219,11 @@ flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
             <p>{{ product.name }}</p>
             <!-- 商品価格 -->
             <p>{{ product.price }}円</p>
+            <p>（税込{{ product.tax_included_price }}円）</p>
         </a>
         </div>
         {% empty %} 
-            <p>No results found</p>
+            <p>該当商品がありませんでした。</p>
         {% endfor %} 
 
         <div class="pagination"> 

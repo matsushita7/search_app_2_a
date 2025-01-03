@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カート</title>
+    <script>
+        // プラスマイナスボタンの動作を制御
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.quantity-selector').forEach(selector => {
+                const decrementButton = selector.querySelector('.decrement');
+                const incrementButton = selector.querySelector('.increment');
+                const inputField = selector.querySelector('.quantity-input');
+
+                // マイナスボタン
+                decrementButton.addEventListener('click', () => {
+                    const currentValue = parseInt(inputField.value, 10);
+                    if (currentValue > 1) {
+                        inputField.value = currentValue - 1;
+                    }
+                });
+
+                // プラスボタン
+                incrementButton.addEventListener('click', () => {
+                    const currentValue = parseInt(inputField.value, 10);
+                    inputField.value = currentValue + 1;
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+
+
+
+    <h1>カートの中身</h1>
+
+    {% if cart %}
+        <form action="{% url 'samapp:update_cart' %}" method="post">
+            {% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名</th>
+                        <th>価格</th>
+                        <th>数量</th>
+                        <th>小計</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product_id, item in cart.items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.price }}円</td>
+                        <td>
+                            <div class="quantity-selector">
+                                <button type="button" class="decrement">−</button>
+                                <input type="number" name="quantity_{{ product_id }}" value="{{ item.quantity }}" min="1" class="quantity-input">
+                                <button type="button" class="increment">＋</button>
+                            </div>
+                        </td>
+                        <td>{{ item.price|floatformat:2|add:item.quantity }}円</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p>合計金額: {{ total_price }}円</p>
+            <button type="submit">更新</button>
+        </form>
+        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
+        <a href="{% url 'samapp:clear_cart' %}" onclick="return confirm('カートを空にしますか？この操作は取り消せません。');">カートを空にする</a>
+    {% else %}
+        <p>カートは空です。</p>
+        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
+    {% endif %}
+    <!-- <h1>カートの中身</h1>
+
+    {% if cart %}
+        <table>
+            <thead>
+                <tr>
+                    <th>商品名</th>
+                    <th>価格</th>
+                    <th>数量</th>
+                    <th>小計</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.values %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.price }}円</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price|floatformat:2|add:item.quantity }}円</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p>合計金額: {{ total_price }}円</p>
+        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
+    {% else %}
+        <p>カートは空です。</p>
+        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
+    {% endif %}
+    <a href="{% url 'samapp:clear_cart' %}">カートを空にする</a> -->
+</body>
+</html>
