@@ -1,0 +1,80 @@
+
+
+body{
+    background-color:rgb(245, 245, 245);
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* .test{
+    width: 1000px;
+} */
+
+.month_ranking{
+    display:flex;
+    justify-content:space-evenly;
+
+}
+.month_ranking_field{
+    height: 400px;
+    background-color: rgb(241, 251, 255);
+}
+.search.hide {
+    transform:translateY(-60px);
+}
+.mainimg{
+    width:100%;
+}
+.flexs{
+    display: flex;
+    text-align: center;
+    width: 100%;
+}
+.header{
+    display: flex;
+    background-color: rgb(103, 103, 103);
+    height:80px;
+    margin:0;
+    width: 100vw;
+    transition: 1s;
+    position: fixed;
+    color:rgb(227, 227, 227);
+}
+.sort{
+    display: flex;
+    flex-direction: column;
+}
+.search-result{
+    display: flex;
+    flex-wrap: wrap; /* 横に並べ、余白があれば次の行に折り返し */
+    gap: 20px; /* 各商品間の間隔 */
+    justify-content: space-between; /* 水平方向に均等配置 */
+    width: 60vw;
+}
+.product-item{
+    flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
+        box-sizing: border-box; /* パディングやボーダーを幅に含める */
+        text-align: center; /* 中央揃え */
+        border: 1px solid #ddd; /* 枠線を追加 */
+        border-radius: 5px; /* 角を丸くする */
+        padding: 10px; /* 内側の余白 */
+}
+.search-item{
+    width: 23vw;
+    padding: 0vw 2vw;
+}
+.login{
+    color:rgb(255, 255, 255);
+    text-decoration: none;
+    padding: 0 20px;
+}
+.logout{
+    color:rgb(255, 255, 255);
+    text-decoration: none;
+}
+
+@media screen and (max-width:480px){
+
+}

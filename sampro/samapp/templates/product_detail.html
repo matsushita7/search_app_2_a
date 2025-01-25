@@ -13,7 +13,7 @@
 <div class="row justify-content-center"> 
     <div class="col-md-8"> 
     <h1 class="text-center mb-4">{{ product.name }}の詳細</h1> 
-                
+    
     <!-- 商品詳細カード --> 
     <div class="card shadow-sm"> 
     <div class="card-body"> 
@@ -30,6 +30,8 @@
         <button type="submit">カートに入れる</button>
     </form>
     </form> 
+
+    <a href="{% url 'samapp:purchase_cart' %}" class="btn btn-primary">購入へ進む</a>
 
     <a href="{% url 'samapp:search' %}" class="btn btn-primary">商品一覧に戻る</a> 
     </div> 

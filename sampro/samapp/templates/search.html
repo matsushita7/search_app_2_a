@@ -1,88 +1,16 @@
 <!DOCTYPE html> 
 <html lang="ja"> 
 <head> 
-
     <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name=”viewport” content=”width=device-width, initial-scale=1″>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'myapp/css/search.css' %}"> 
     <title>検索</title> 
 </head> 
 
 <body> 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-{% load static %}
-
-<style>
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-}
-
-/* .search{
-    
-    background-color: black;
-    height:60px;
-    margin:0;
-    width: 100vw;
-    transition: 1s;
-    position: fixed;
-} */
-.search.hide {
-    transform:translateY(-60px);
-}
-.mainimg{
-    width:100%;
-}
-.flexs{
-    display: flex;
-    text-align: center;
-    width: 100%;
-    
-    margin: auto;
-}
-.header{
-    display: flex;
-    background-color: rgb(33, 33, 33);
-    height:80px;
-    margin:0;
-    width: 100vw;
-    transition: 1s;
-    position: fixed;
-    color:rgb(227, 227, 227);
-}
-.sort{
-    display: flex;
-    flex-direction: column;
-}
-.search-result{
-    display: flex;
-    flex-wrap: wrap; /* 横に並べ、余白があれば次の行に折り返し */
-    gap: 20px; /* 各商品間の間隔 */
-    justify-content: space-between; /* 水平方向に均等配置 */
-    width: 70vw;
-}
-.product-item{
-flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
-        box-sizing: border-box; /* パディングやボーダーを幅に含める */
-        text-align: center; /* 中央揃え */
-        border: 1px solid #ddd; /* 枠線を追加 */
-        border-radius: 5px; /* 角を丸くする */
-        padding: 10px; /* 内側の余白 */
-}
-.search-item{
-    width: 25vw;
-    padding: 0vw 2vw;
-}
-.login{
-    color:rgb(255, 255, 255);
-    text-decoration: none;
-    padding: 0 20px;
-}
-.logout{
-    color:rgb(255, 255, 255);
-    text-decoration: none;
-}
-</style>
 
 
 <script>
@@ -130,6 +58,9 @@ flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
 
 <div class="header"> <!--ヘッダー要素-->
     <p class="title">hello</p>
+    <form method="get">
+    {{ form.as_p }}
+    </form>
     <a href="{% url 'account_login' %}" class="login">Login</a>
     <a href="{% url 'account_logout' %} " class="logout">Logout</a>
     <a href="{% url 'samapp:view_cart' %}">カート</a>
@@ -137,111 +68,143 @@ flex: 0 0 calc(33.333% - 20px); /* 横に3つ並べるための幅計算 */
 
 <img src="{% static 'myapp/4877368.jpg' %}" class="mainimg">
 
+
+<div class="month_ranking_field">
+    <h2>売れ筋ランキング</h2>
+        <div class="month_ranking">
+        {% for item in ranked_products %}
+            <div class="month_ranking_flex">
+            {% if item.product_img %}
+                <!-- 画像が存在する場合 -->
+                <img src="{{ item.product_img }}" alt="{{ item.product_name }}" style="width:200px; height:auto;">
+            {% else %}
+                <!-- 画像が存在しない場合のプレースホルダー -->
+                <img src="/static/images/no_image_available.png" alt="No Image" style="width:200px; height:auto;">
+            {% endif %}
+                <p>表示</p>
+                <p>{{ item.product_name }}</p>
+                <p>売れた個数: {{ item.total_quantity }}個</p>
+                <a href="{% url 'samapp:product_detail' item.product_id %}">商品ページへ</a>
+            </div>
+        {% endfor %}
+        </div>
+</div>
+
+
+<div class="test">
+
 <div class="flexs">
-<div class="flex-child">
-    <div class="search-item">
-    <form method="get">
-        <div class="search">
-        {{ form.as_p }}
-        </div>
-        <div class="sort">
+    <div class="flex-child">
+        <div class="search-item">
+        <form method="get">
+            <div class="search">
+            {{ form.as_p }}
+            </div>
+            <div class="sort">
 
-            
-        <label for="category">カテゴリを選択:</label>
-        <select name="category" id="category">
-            <option value="">すべて</option>
-                {% for category in categories %}
-                <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_id %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-                {% for subcategory in category.children.all %}
-                    <option value="{{ subcategory.id }}" {% if subcategory.id|stringformat:"s" == category_id %}selected{% endif %}>
-                        -- {{ subcategory.name }}
+
+            <label for="category">カテゴリを選択:</label>
+            <select name="category" id="category">
+                <option value="">すべて</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_id %}selected{% endif %}>
+                        {{ category.name }}
                     </option>
+                    {% for subcategory in category.children.all %}
+                        <option value="{{ subcategory.id }}" {% if subcategory.id|stringformat:"s" == category_id %}selected{% endif %}>
+                            -- {{ subcategory.name }}
+                        </option>
+                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
-        </select>
+            </select>
 
-        <label for="sort">並び替え:</label> 
-        <select name="sort"> 
-            <option value="name" {% if sort_by == "name" %}selected{% endif %}>名前順</option> 
-            <option value="price_asc" {% if sort_by == "price_asc" %}selected{% endif %}>価格が安い順</option> 
-            <option value="price_desc" {% if sort_by == "price_desc" %}selected{% endif %}>価格が高い順</option> 
-        </select> 
+            <label for="sort">並び替え:</label> 
+            <select name="sort"> 
+                <option value="name" {% if sort_by == "name" %}selected{% endif %}>名前順</option> 
+                <option value="price_asc" {% if sort_by == "price_asc" %}selected{% endif %}>価格が安い順</option> 
+                <option value="price_desc" {% if sort_by == "price_desc" %}selected{% endif %}>価格が高い順</option> 
+            </select> 
 
-        <fieldset>
-            <legend>価格帯</legend>
-            <label>
-                <input type="checkbox" name="price_range" value="0-1000" class="price-checkbox" 
-                    {% if "0-1000" in price_ranges %}checked{% endif %}> 0円〜1000円
-            </label><br>
-            <label>
-                <input type="checkbox" name="price_range" value="1000-5000" class="price-checkbox" 
-                    {% if "1000-5000" in price_ranges %}checked{% endif %}> 1000円〜5000円
-            </label><br>
-            <label>
-                <input type="checkbox" name="price_range" value="5000-10000" class="price-checkbox" 
-                    {% if "5000-10000" in price_ranges %}checked{% endif %}> 5000円〜10000円
-            </label><br>
-            <label>
-                <input type="checkbox" name="price_range" value="10000-30000" class="price-checkbox" 
-                    {% if "10000-30000" in price_ranges %}checked{% endif %}> 10000円〜30000円
-            </label><br>
-            <label>
-                <input type="checkbox" name="price_range" value="30000-" class="price-checkbox" 
-                    {% if "30000-" in price_ranges %}checked{% endif %}> 30000円以上
-            </label><br>
-        </fieldset>
-        
-        <label for="min_price">最低価格:</label>
-        <input type="number" id="min_price" name="min_price" min="0" value="{{ min_price }}">
-        
-        <label for="max_price">最高価格:</label>
-        <input type="number" id="max_price" name="max_price" min="0" value="{{ max_price }}">
-        <button type="submit">検索</button> 
+            <fieldset>
+                <legend>価格帯</legend>
+                <label>
+                    <input type="checkbox" name="price_range" value="0-1000" class="price-checkbox" 
+                        {% if "0-1000" in price_ranges %}checked{% endif %}> 0円〜1000円
+                </label><br>
+                <label>
+                    <input type="checkbox" name="price_range" value="1000-5000" class="price-checkbox" 
+                        {% if "1000-5000" in price_ranges %}checked{% endif %}> 1000円〜5000円
+                </label><br>
+                <label>
+                    <input type="checkbox" name="price_range" value="5000-10000" class="price-checkbox" 
+                        {% if "5000-10000" in price_ranges %}checked{% endif %}> 5000円〜10000円
+                </label><br>
+                <label>
+                    <input type="checkbox" name="price_range" value="10000-30000" class="price-checkbox" 
+                        {% if "10000-30000" in price_ranges %}checked{% endif %}> 10000円〜30000円
+                </label><br>
+                <label>
+                    <input type="checkbox" name="price_range" value="30000-" class="price-checkbox" 
+                        {% if "30000-" in price_ranges %}checked{% endif %}> 30000円以上
+                </label><br>
+            </fieldset>
+            
+            <label for="min_price">最低価格:</label>
+            <input type="number" id="min_price" name="min_price" min="0" value="{{ min_price }}">
+            
+            <label for="max_price">最高価格:</label>
+            <input type="number" id="max_price" name="max_price" min="0" value="{{ max_price }}">
+            <button type="submit">検索</button> 
+            </div>
+        </form>
+        <form method="get" action="{% url 'samapp:search' %}">
+            <button type="submit">クリア</button>
+        </form>
         </div>
-    </form>
-    <form method="get" action="{% url 'samapp:search' %}">
-        <button type="submit">クリア</button>
-    </form>
+    </div>
+
+    <div class="flex-child">
+        <P>{{ results_count }}件</P>
+        <div class="search-result">
+            {% for product in page_obj %} 
+            <div class="product-item">
+            {% with product.images.first as first_image %}
+                {% if first_image %}
+                    <img src="{{ first_image.image.url }}" alt="画像" style="width:200px; height:auto;">
+                {% endif %}
+            {% endwith %}
+            <a href="{% url 'samapp:product_detail' pk=product.id %}">
+                <!-- 商品画像 -->
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                <!-- 商品名 -->
+                <p>{{ product.name }}</p>
+                <!-- 商品価格 -->
+                <p>{{ product.price }}円</p>
+                <p>（税込{{ product.tax_included_price }}円）</p>
+            </a>
+            </div>
+            {% empty %} 
+                <p>該当商品がありませんでした。</p>
+            {% endfor %} 
+
+            <div class="pagination"> 
+                <span class="step-links"> 
+                    {% if page_obj.has_previous %} 
+                        <a href="?page=1">最初</a> 
+                        <a href="?page={{ page_obj.previous_page_number }}">前へ</a> 
+                    {% endif %} 
+
+                    <span>ページ {{ page_obj.number }} /  
+            {{ page_obj.paginator.num_pages }}</span> 
+
+                    {% if page_obj.has_next %} 
+                        <a href="?page={{ page_obj.next_page_number }}">次へ</a> 
+                        <a href="?page={{ page_obj.paginator.num_pages }}">最後</a> 
+                    {% endif %} 
+                </span> 
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="flex-child">
-    <P>{{ results_count }}件</P>
-    <div class="search-result">
-        {% for product in page_obj %} 
-        <div class="product-item">
-        <a href="{% url 'samapp:product_detail' pk=product.id %}">
-            <!-- 商品画像 -->
-            <img src="{{ product.image.url }}" alt="{{ product.name }}">
-            <!-- 商品名 -->
-            <p>{{ product.name }}</p>
-            <!-- 商品価格 -->
-            <p>{{ product.price }}円</p>
-            <p>（税込{{ product.tax_included_price }}円）</p>
-        </a>
-        </div>
-        {% empty %} 
-            <p>該当商品がありませんでした。</p>
-        {% endfor %} 
-
-        <div class="pagination"> 
-            <span class="step-links"> 
-                {% if page_obj.has_previous %} 
-                    <a href="?page=1">最初</a> 
-                    <a href="?page={{ page_obj.previous_page_number }}">前へ</a> 
-                {% endif %} 
-
-                <span>ページ {{ page_obj.number }} /  
-        {{ page_obj.paginator.num_pages }}</span> 
-
-                {% if page_obj.has_next %} 
-                    <a href="?page={{ page_obj.next_page_number }}">次へ</a> 
-                    <a href="?page={{ page_obj.paginator.num_pages }}">最後</a> 
-                {% endif %} 
-            </span> 
-        </div>
-    </div>
-</div>
 </div>

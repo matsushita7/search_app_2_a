@@ -1,11 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect 
-from .models import Product, Category, Review
+from .models import Product, Category, Review, Purchase
 from .forms import ProductForm, SearchForm, ReviewForm
 from django.core.paginator import Paginator 
-from django.db.models import Q
+from django.db.models import Q,Sum
 from django.contrib import messages
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
+from django.utils.timezone import now, timedelta
+from django.core.cache import cache
+
+
 
 
 def product_create(request): 
@@ -49,13 +53,12 @@ def search_view(request):
     query = request.GET.get('query', '')
     form = SearchForm(request.GET or None) 
     category_id = request.GET.get('category', '')  # カテゴリIDを取得
-    # categories = Category.objects.all()
     categories = Category.objects.filter(parent=None).prefetch_related('children')
     subcategories = []  # 子カテゴリを格納するリスト
     results = Product.objects.all()  # クエリセットの初期化 
-    TAX_RATE = Decimal(0.1)
+    TAX_RATE = Decimal(0.1)#税金
     
-    if form.is_valid(): 
+    if form.is_valid(): #ワード検索フィルタリング
         query = form.cleaned_data['query'] 
         if query: 
             results = results.filter(name__icontains=query)
@@ -104,18 +107,24 @@ def search_view(request):
         results = results.order_by('price') 
     elif sort_by == 'price_desc': 
         results = results.order_by('-price') 
-    print(results)
     #resultsのデータをいじる
     # クエリセットをリストに変換せず、直接Paginatorに渡す 
     paginator = Paginator(results,20)
     page_number = request.GET.get('page') 
     page_obj = paginator.get_page(page_number)
     results_count = results.count()
-    
+
     for product in page_obj:
         product.tax_included_price = round(product.price * (1 + TAX_RATE), 2)
 
-    
+    # 過去30日の売れ筋ランキング表示
+    ranked_products = cache.get('bestseller_ranking', [])
+    print(ranked_products)
+    if not ranked_products:
+        # ランキングがキャッシュに存在しない場合は空のリストを返す
+        ranked_products = []
+        print("入ってない")
+
     context = {
         'page_obj':page_obj,
         'form':form,
@@ -129,6 +138,7 @@ def search_view(request):
         'price_ranges': price_ranges,
         'subcategories': subcategories,
         'categories':categories,
+        'ranked_products': ranked_products,
     }
 
     return render(request, 'search.html', context)
@@ -222,7 +232,7 @@ def update_cart(request):
     return redirect("samapp:view_cart")
 
 @login_required
-def product_review(request, product_id):
+def product_review(request, product_id): #レビュー機能
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == 'POST':
@@ -237,6 +247,89 @@ def product_review(request, product_id):
         form = ReviewForm()
 
     return render(request, 'product_review.html', {'form': form, 'product': product})
+
+@login_required
+def purchase_product(request, product_id):#商品詳細ページからの商品購入データ受け取り
+    """
+    商品詳細ページから1つの商品を購入
+    """
+    product = get_object_or_404(Product, id=product_id)
+    
+    if request.method == 'POST':
+        # 購入処理
+        quantity = int(request.POST.get('quantity', 1))
+        total_price = product.price * quantity
+        Purchase.objects.create(
+            product=product,
+            buyer=request.user,
+            quantity=quantity,
+            total_price=total_price
+        )
+        return redirect('samapp:purchase_complete', product_id=product_id)
+
+    # 確認画面
+    return render(request, 'confirm_purchase.html', {
+        'product': product,
+        'quantity': 1,
+    })
+
+@login_required
+def purchase_cart(request):
+    """
+    カート内の商品を一括購入
+    """
+    cart = request.session.get('cart', {})
+    purchases = []
+    total_price = 0
+
+    if request.method == 'POST':
+        # 購入処理
+        for product_id, item in cart.items():
+            product = get_object_or_404(Product, id=product_id)
+            quantity = item['quantity']
+            total_price += product.price * quantity
+            purchases.append(Purchase(
+                product=product,
+                buyer=request.user,
+                quantity=quantity,
+                total_price=product.price * quantity
+            ))
+        Purchase.objects.bulk_create(purchases)
+
+        # カートを空にする
+        request.session['cart'] = {}
+        return redirect('samapp:purchase_complete_cart')
+
+    # 確認画面用データ
+    cart_products = []
+    for product_id, item in cart.items():
+        product = get_object_or_404(Product, id=product_id)
+        cart_products.append({
+            'product': product,
+            'quantity': item['quantity'],
+            'total_price': product.price * item['quantity'],
+        })
+
+    return render(request, 'confirm_purchase_cart.html', {
+        'cart_products': cart_products,
+        'total_price': sum(item['total_price'] for item in cart_products),
+    })
+
+
+def purchase_complete(request, product_id=None):
+    """
+    購入完了画面
+    """
+    product = get_object_or_404(Product, id=product_id) if product_id else None
+    return render(request, 'purchase_complete.html', {'product': product})
+
+
+def purchase_complete_cart(request):
+    """
+    カート購入完了画面
+    """
+    return render(request, 'purchase_complete_cart.html')
+
 
 
 #　購入が押された商品のデータを入手し、売れ筋ランキングや、管理者画面から在庫追加した方がいいものを見れるようにする。

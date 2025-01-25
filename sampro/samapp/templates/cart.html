@@ -67,41 +67,11 @@
             <p>合計金額: {{ total_price }}円</p>
             <button type="submit">更新</button>
         </form>
-        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
+        <a href="{% url 'samapp:purchase_cart' %}">購入へ進む</a>
         <a href="{% url 'samapp:clear_cart' %}" onclick="return confirm('カートを空にしますか？この操作は取り消せません。');">カートを空にする</a>
     {% else %}
         <p>カートは空です。</p>
-        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
     {% endif %}
-    <!-- <h1>カートの中身</h1>
-
-    {% if cart %}
-        <table>
-            <thead>
-                <tr>
-                    <th>商品名</th>
-                    <th>価格</th>
-                    <th>数量</th>
-                    <th>小計</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart.values %}
-                <tr>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.price }}円</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.price|floatformat:2|add:item.quantity }}円</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p>合計金額: {{ total_price }}円</p>
-        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
-    {% else %}
-        <p>カートは空です。</p>
-        <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
-    {% endif %}
-    <a href="{% url 'samapp:clear_cart' %}">カートを空にする</a> -->
+    <a href="{% url 'samapp:search' %}">商品一覧に戻る</a>
 </body>
 </html>

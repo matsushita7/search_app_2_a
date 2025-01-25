@@ -16,7 +16,7 @@
         <form action="{% url 'samapp:product_detail' pk=product.id %}">
             <button type="submit">ショッピングを続ける</button>
         </form>
-        <form action="{% url 'samapp:cart_detail' %}">
+        <form action="{% url 'samapp:purchase_cart' %}">
             <button type="submit">購入へ進む</button>
         </form>
     </div>

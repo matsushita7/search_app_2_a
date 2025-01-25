@@ -1,0 +1,14 @@
+<h1>購入確認</h1>
+<ul>
+    {% for item in cart_products %}
+    <li>
+        商品: {{ item.product.name }} | 数量: {{ item.quantity }} | 小計: {{ item.total_price }}円
+    </li>
+    {% endfor %}
+</ul>
+<p>合計金額: {{ total_price }}円</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">購入を確定する</button>
+</form>
+<a href="{% url 'samapp:view_cart' %}">戻る</a>
