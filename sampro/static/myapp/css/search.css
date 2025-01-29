@@ -2,15 +2,21 @@
 
 body{
     background-color:rgb(245, 245, 245);
+    height: 5000px;
 }
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
 }
 /* .test{
     width: 1000px;
 } */
+.osusume{
+    background-color: rgb(207,222,227);
+    height: 532px;
+}
 
 .month_ranking{
     display:flex;
@@ -21,9 +27,7 @@ body{
     height: 400px;
     background-color: rgb(241, 251, 255);
 }
-.search.hide {
-    transform:translateY(-60px);
-}
+
 .mainimg{
     width:100%;
 }
@@ -31,17 +35,95 @@ body{
     display: flex;
     text-align: center;
     width: 100%;
+    overflow: visible;
 }
+
+.header.hide {
+    transform: translateY(-80px); /* ヘッダーを隠す */
+    opacity: 0; /* 見えなくする */
+}
+
 .header{
+    transition: transform 0.5s ease, opacity 0.5s ease; /* スムーズな動き */
     display: flex;
     background-color: rgb(103, 103, 103);
     height:80px;
     margin:0;
-    width: 100vw;
-    transition: 1s;
+    width: 100%;
     position: fixed;
     color:rgb(227, 227, 227);
 }
+.title{
+    color:#ffffff;
+    font-family:fantasy;
+    font-size: 45px;
+    margin-top: 10px;
+    margin-left: 90px;
+    text-decoration: none;
+}
+.header-left{
+    flex-grow: 1;
+    text-align: left;
+    display: flex;
+    align-items: center;
+}
+
+.header-right{
+    display: flex;
+    align-items: center;
+    gap:20px;
+    margin-right: 150px;
+}
+
+.search-input {
+    width: 270px;      /* 幅を指定 */
+    height: 35px;      /* 高さを指定 */
+    padding: 10px;     /* 内側の余白 */
+    font-size: 16px;   /* フォントサイズ */
+    border: 1px solid #ccc; /* ボーダーを追加 */
+    border-radius: 5px; /* 角を丸くする */
+}
+.head-form {
+    display: flex;
+    align-items: center; /* ボタンと検索バーを縦方向に揃える */
+    gap: 10px; /* ボタンと入力欄の間隔 */
+}
+.search-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+}
+
+.login, .logout, .cart, .account {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.login:hover, .logout:hover, .cart-button:hover, .account:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.cart-button {
+    background: none;  /* 背景色を削除 */
+    border: none;   /* ボーダーを削除 */
+    padding: 0;        /* 余白をなくす */
+    cursor: pointer;   /* カーソルをポインターに */
+    transition: 0.5s;
+}
+
+
+
+
 .sort{
     display: flex;
     flex-direction: column;
@@ -60,10 +142,18 @@ body{
         border: 1px solid #ddd; /* 枠線を追加 */
         border-radius: 5px; /* 角を丸くする */
         padding: 10px; /* 内側の余白 */
+
 }
 .search-item{
     width: 23vw;
     padding: 0vw 2vw;
+    position: sticky; /* 固定表示 */
+    top: 300px; /* 上から20px離れて表示 */
+    align-self: flex-start; /* 縦方向の開始位置で揃える */
+    background-color: #fff; /* 背景色を指定（必須ではないが推奨） */
+    z-index: 10; /* 他の要素より前面に表示 */
+    border: 1px solid #ddd; /* 必要なら境界線を追加 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 滑らかな影を追加（任意） */
 }
 .login{
     color:rgb(255, 255, 255);

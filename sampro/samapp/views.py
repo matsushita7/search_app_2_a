@@ -330,7 +330,9 @@ def purchase_complete_cart(request):
     """
     return render(request, 'purchase_complete_cart.html')
 
-
+def account_show_view(request):
+    products = Product.objects.all() 
+    return render(request, 'account_show.html') 
 
 #　購入が押された商品のデータを入手し、売れ筋ランキングや、管理者画面から在庫追加した方がいいものを見れるようにする。
 # 検索数トップも作る

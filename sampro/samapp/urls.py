@@ -16,4 +16,5 @@ urlpatterns = [
     path('cart/purchase/', views.purchase_cart, name='purchase_cart'),#カートページ購入
     path('products/<int:product_id>/purchase/complete/', views.purchase_complete, name='purchase_complete'),#商品詳細ページ購入完了
     path('cart/purchase/complete/', views.purchase_complete_cart, name='purchase_complete_cart'),#カートページ購入完了
+    path('product/account/', views.account_show_view, name='account_view')#アカウント情報閲覧
 ]

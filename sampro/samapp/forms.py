@@ -3,10 +3,10 @@ from .models import Product,Review
 
 class SearchForm(forms.Form):#検索ワードのフォーム
     query = forms.CharField(
-        label='検索キーワード',
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={'placeholder':'検索したいキーワードを入力'})
+        label='',
+        widget=forms.TextInput(attrs={'placeholder':'検索したいキーワードを入力','class': 'search-input'})
         )
     
 class ProductForm(forms.ModelForm):#商品追加のフォーム
