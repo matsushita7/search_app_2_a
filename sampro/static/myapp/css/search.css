@@ -153,7 +153,7 @@ body{
     background-color: #fff; /* 背景色を指定（必須ではないが推奨） */
     z-index: 10; /* 他の要素より前面に表示 */
     border: 1px solid #ddd; /* 必要なら境界線を追加 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 滑らかな影を追加（任意） */
+    box-shadow: 0 5px 6px rgba(0, 0, 0, 0.1); /* 滑らかな影を追加（任意） */
 }
 .login{
     color:rgb(255, 255, 255);
