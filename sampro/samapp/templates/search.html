@@ -1,16 +1,4 @@
 {% extends 'header_fotter.html' %}
-<!-- <!DOCTYPE html> 
-<html lang="ja"> 
-<head> 
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name=”viewport” content=”width=device-width, initial-scale=1″>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'myapp/css/search.css' %}"> 
-    <title>検索</title> 
-</head>  -->
-
-
 {% block title %}mainpage{% endblock %}
 
 {% block content %}
@@ -82,37 +70,7 @@
 
 </script>
 
-<!-- <div class="header">
-    <div class="header-left">
-        <p class="title">GADGET</p>
-    </div>
 
-    <div class="header-right">
-        <form method="get" class="head-form">
-            {{ form.as_p }}
-            <button type="submit" class="search-button">
-                <img src="{% static 'myapp/search.png' %}" alt="検索" style="width:20px; height:20px;">
-            </button>
-        </form>
-
-        {% if user.is_authenticated %}
-            <a href="{% url 'account_logout' %} " class="logout">Logout</a>
-        {% else %}
-            <a href="{% url 'account_login' %}" class="login">Login</a>
-        {% endif %}
-
-        <a href="{% url 'samapp:view_cart' %}">
-            <button type="submit" class="cart-button">
-                <img src="{% static 'myapp/cart.png' %}" alt="cart" style="width:30px; height:30px;">
-            </button>
-        </a>
-        <a href="{% url 'samapp:account_view' %}" class="account">
-            <button type="submit" class="cart-button">
-                <img src="{% static 'myapp/accounts.png' %}" alt="account" style="width:30px; height:34px;">
-            </button>
-        </a>
-    </div>
-</div> -->
 
 
 
@@ -207,16 +165,16 @@
             
             <label for="max_price">最高価格:</label>
             <input type="number" id="max_price" name="max_price" min="0" value="{{ max_price }}">
-            <button type="submit">検索</button> 
+            <button type="submit" class="search-button-clea">検索</button> 
             </div>
         </form>
         <form method="get" action="{% url 'samapp:search' %}">
-            <button type="submit">クリア</button>
+            <button type="submit" class="search-button-clea">クリア</button>
         </form>
         </div>
     </div>
 
-    <div class="flex-child">
+    <!-- <div class="flex-child">
         <P>{{ results_count }}件</P>
         <div class="search-result">
             {% for product in page_obj %} 
@@ -226,12 +184,8 @@
                     <img src="{{ first_image.image.url }}" alt="画像" style="width:200px; height:auto;">
                 {% endif %}
             {% endwith %}
-            <a href="{% url 'samapp:product_detail' pk=product.id %}">
-                <!-- 商品画像 -->
-                <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                <!-- 商品名 -->
+            <a href="{% url 'samapp:product_detail' pk=product.id %}" class="search-item-text">
                 <p>{{ product.name }}</p>
-                <!-- 商品価格 -->
                 <p>{{ product.price }}円</p>
                 <p>（税込{{ product.tax_included_price }}円）</p>
             </a>
@@ -257,8 +211,66 @@
                 </span> 
             </div>
         </div>
+    </div> -->
+
+
+
+    <div class="flex-child">
+        <p>{{ results_count }}件</p>
+        <div class="search-result">
+            {% for product in page_obj %} 
+            <a href="{% url 'samapp:product_detail' pk=product.id %}" class="product-item-link">
+                <div class="product-item">
+                    {% with product.images.first as first_image %}
+                        {% if first_image %}
+                            <img src="{{ first_image.image.url }}" alt="画像" style="width:200px; height:auto;">
+                        {% endif %}
+                    {% endwith %}
+                    <!-- 商品名 -->
+                    <p>{{ product.name }}</p>
+                    <!-- 商品価格 -->
+                    <p>{{ product.price }}円</p>
+                    <p>（税込{{ product.tax_included_price }}円）</p>
+                </div>
+            </a>
+            {% empty %} 
+                <p>該当商品がありませんでした。</p>
+            {% endfor %} 
+    
+            <div class="pagination"> 
+                <span class="step-links"> 
+                    {% if page_obj.has_previous %} 
+                        <a href="?page=1">最初</a> 
+                        <a href="?page={{ page_obj.previous_page_number }}">前へ</a> 
+                    {% endif %} 
+    
+                    <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span> 
+    
+                    {% if page_obj.has_next %} 
+                        <a href="?page={{ page_obj.next_page_number }}">次へ</a> 
+                        <a href="?page={{ page_obj.paginator.num_pages }}">最後</a> 
+                    {% endif %} 
+                </span> 
+            </div>
+        </div>
     </div>
+
+
+
+
+
 </div>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
 {% endblock %}

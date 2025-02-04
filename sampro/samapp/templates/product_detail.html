@@ -3,8 +3,10 @@
 <!DOCTYPE html> 
 <html lang="ja"> 
 <head> 
+    {% load static %}
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <link rel="stylesheet" href="{% static 'myapp/css/search.css' %}"> 
     <title>商品詳細</title> 
 
 </head> 
@@ -16,16 +18,16 @@
     
     <!-- 商品詳細カード --> 
     <div class="card shadow-sm"> 
-    <div class="card-body"> 
+    <div class="detail-card-body"> 
     <h2 class="card-title">{{ product.name }}</h2> 
         <p class="card-text">{{ product.description }}</p> 
         <p class="card-text"><strong>{{ product.price|floatformat:0|intcomma }}円</strong></p>
     <form action="{% url 'samapp:add_to_cart' product.id %}" method="post">
         {% csrf_token %}
-        <div class="quantity-selector">
-            <button type="button" class="decrement">−</button>
+        <div class="detail-quantity-selector">
+            <button type="button" class="detail-decrement">−</button>
             <input type="number" name="quantity" value="1" min="1" class="quantity-input">
-            <button type="button" class="increment">＋</button>
+            <button type="button" class="detail-increment">＋</button>
         </div>
         <button type="submit">カートに入れる</button>
     </form>
